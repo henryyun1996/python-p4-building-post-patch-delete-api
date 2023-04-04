@@ -52,20 +52,43 @@ def game_by_id(id):
 
     return response
 
-@app.route('/reviews')
+@app.route('/reviews', methods=['GET', 'POST'])
 def reviews():
 
-    reviews = []
-    for review in Review.query.all():
-        review_dict = review.to_dict()
-        reviews.append(review_dict)
+    if request.method == 'GET':
+        reviews = []
+        for review in Review.query.all():
+            review_dict = review.to_dict()
+            reviews.append(review_dict)
 
-    response = make_response(
-        reviews,
-        200
-    )
+        response = make_response(
+            reviews,
+            200
+        )
 
-    return response
+        return response
+    
+    elif request.method == 'POST':
+        new_review = Review(
+            score=request.form.get("score"),
+            comment=request.form.get("comment"),
+            game_id=request.form.get("game_id"),
+            user_id=request.form.get("user_id")
+        )
+
+        db.session.add(new_review)
+        db.session.commit()
+
+        review_dict = new_review.to_dict()
+
+        response = make_response(
+            review_dict,
+            200
+        )
+
+        return response
+
+ v
 
 @app.route('/users')
 def users():
